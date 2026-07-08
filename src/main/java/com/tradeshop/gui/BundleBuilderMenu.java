@@ -4,7 +4,6 @@ import com.tradeshop.data.ShopState;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.SimpleMenuProvider;
-import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 
@@ -61,8 +60,8 @@ public class BundleBuilderMenu extends ShopMenu {
 			slot++;
 		}
 		setButton(45, Icons.of(new ItemStack(Items.BARRIER), "Cancel"), () -> openLater(player::closeContainer));
-		setButton(49, Icons.of(new ItemStack(Items.DYE.pick(DyeColor.LIME)), "Confirm", bundle.size() + " item type(s) selected"), this::confirm);
-		setButton(53, Icons.of(new ItemStack(Items.DYE.pick(DyeColor.RED)), "Clear All"), () -> {
+		setButton(49, Icons.of(new ItemStack(Items.LIME_DYE), "Confirm", bundle.size() + " item type(s) selected"), this::confirm);
+		setButton(53, Icons.of(new ItemStack(Items.RED_DYE), "Clear All"), () -> {
 			bundle.clear();
 			render();
 		});
