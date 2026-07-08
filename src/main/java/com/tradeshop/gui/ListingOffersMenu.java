@@ -3,6 +3,7 @@ package com.tradeshop.gui;
 import com.tradeshop.data.Offer;
 import com.tradeshop.data.OfferStatus;
 import com.tradeshop.data.ShopState;
+import com.tradeshop.trade.TradeService;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.SimpleMenuProvider;
@@ -73,9 +74,11 @@ public class ListingOffersMenu extends ShopMenu {
 		List<Offer> affected = state.offersForListing(listingId).stream()
 				.filter(o -> o.status == OfferStatus.PENDING || o.status == OfferStatus.SELLER_ACCEPTED)
 				.toList();
+		List<ItemStack> escrowedItems = state.findListing(listingId).map(l -> l.items).orElse(List.of());
 		boolean cancelled = state.cancelListing(listingId, player.getUUID());
 		if (cancelled) {
-			player.sendSystemMessage(Component.literal("Listing cancelled."));
+			TradeService.giveAll(player, escrowedItems);
+			player.sendSystemMessage(Component.literal("Listing cancelled. Your items have been returned."));
 			for (Offer offer : affected) {
 				ServerPlayer offerer = player.level().getServer().getPlayerList().getPlayer(offer.offererId);
 				if (offerer != null) {

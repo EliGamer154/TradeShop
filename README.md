@@ -6,12 +6,12 @@ A Fabric server-side mod for Minecraft **26.1.2 - 26.2** that adds a `/shop` pla
 
 Run `/shop` to open the trade menu:
 
-- **Add Listing** — pick items from your inventory (up to 9 distinct item types) that you're willing to trade away. Items stay in your inventory; nothing is taken from you yet.
-- **Browse Listings** — see other players' open listings and make an offer (also built from your own inventory).
-- **My Listings** — see offers made on your listings and **accept** one. Accepting a specific offer automatically cancels the other pending offers on that listing.
-- **My Offers** — once the seller accepts your offer, come back here and **confirm** to complete the trade.
+- **Add Listing** — pick items from your inventory (up to 9 distinct item types) that you're willing to trade away. Confirming **removes those items from your inventory immediately** and holds them in escrow inside the listing. You get them back in full if you cancel the listing; they're only handed to the buyer once a trade actually completes.
+- **Browse Listings** — see other players' open listings and make an offer (built from your own inventory, but offer items are *not* taken from you until the trade completes).
+- **My Listings** — see offers made on your listings and **accept** one, or **cancel the listing** entirely (which returns the escrowed items to you and cancels any pending/accepted offers against it). Accepting a specific offer automatically cancels the other pending offers on that listing.
+- **My Offers** — click an offer to open its detail screen. Once the seller accepts, **Confirm Trade** completes it; at any point before that you can **Withdraw Offer**.
 
-The trade only actually happens when both sides have confirmed, and only if both players still have the required items in their inventory at that moment. If either side is missing an item, the trade fails, both players are notified, and the listing reopens so the seller can accept a different offer.
+The trade only actually happens when both sides have confirmed. Since the listing's items are already held in escrow, only the buyer's offered items are checked at that point — if the buyer no longer has them, the trade fails, both players are notified, and the listing reopens so the seller can accept a different offer.
 
 ## Requirements
 

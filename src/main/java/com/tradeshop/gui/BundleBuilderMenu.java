@@ -1,6 +1,7 @@
 package com.tradeshop.gui;
 
 import com.tradeshop.data.ShopState;
+import com.tradeshop.trade.TradeService;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.SimpleMenuProvider;
@@ -93,8 +94,15 @@ public class BundleBuilderMenu extends ShopMenu {
 		List<ItemStack> items = new ArrayList<>(bundle.values());
 		ShopState state = ShopState.get(player.level().getServer());
 		if (mode == Mode.LISTING) {
+			if (!TradeService.hasAll(player, items)) {
+				player.sendSystemMessage(Component.literal("You no longer have all of those items - listing not created."));
+				bundle.clear();
+				render();
+				return;
+			}
+			TradeService.removeAll(player, items);
 			state.addListing(player, items);
-			player.sendSystemMessage(Component.literal("Listing created!"));
+			player.sendSystemMessage(Component.literal("Listing created! The items have been taken from your inventory until it sells or you cancel it."));
 		} else {
 			state.findListing(listingId).ifPresentOrElse(listing -> {
 				state.addOffer(player, listing, items);

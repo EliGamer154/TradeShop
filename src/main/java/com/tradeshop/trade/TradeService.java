@@ -25,6 +25,11 @@ public final class TradeService {
 		NOT_FOUND
 	}
 
+	/**
+	 * Finalizes a trade. Listing items are held in escrow (already removed from
+	 * the seller's inventory when the listing was created), so only the buyer's
+	 * offered items need to still be present here - the seller's side can't fail.
+	 */
 	public static Result buyerConfirm(MinecraftServer server, ShopState state, UUID offerId) {
 		Offer offer = state.findOffer(offerId).orElse(null);
 		if (offer == null || offer.status != OfferStatus.SELLER_ACCEPTED) {
@@ -41,15 +46,14 @@ public final class TradeService {
 			return Result.OFFLINE;
 		}
 
-		if (!hasAll(seller, listing.items) || !hasAll(buyer, offer.items)) {
+		if (!hasAll(buyer, offer.items)) {
 			offer.status = OfferStatus.FAILED;
 			listing.status = ListingStatus.OPEN;
-			seller.sendSystemMessage(Component.literal("Trade with " + buyer.getGameProfile().name() + " failed - missing items. Your listing is open again."));
-			buyer.sendSystemMessage(Component.literal("Trade failed - one of you no longer has the required items."));
+			seller.sendSystemMessage(Component.literal("Trade with " + buyer.getGameProfile().name() + " failed - they no longer have the offered items. Your listing is open again."));
+			buyer.sendSystemMessage(Component.literal("Trade failed - you no longer have the items you offered."));
 			return Result.MISSING_ITEMS;
 		}
 
-		removeAll(seller, listing.items);
 		removeAll(buyer, offer.items);
 		giveAll(buyer, listing.items);
 		giveAll(seller, offer.items);
@@ -63,7 +67,7 @@ public final class TradeService {
 		return Result.SUCCESS;
 	}
 
-	private static boolean hasAll(ServerPlayer player, List<ItemStack> required) {
+	public static boolean hasAll(ServerPlayer player, List<ItemStack> required) {
 		for (ItemStack req : required) {
 			if (!hasEnough(player, req)) {
 				return false;
@@ -91,7 +95,7 @@ public final class TradeService {
 		return !a.isEmpty() && ItemStack.isSameItemSameComponents(a, b);
 	}
 
-	private static void removeAll(ServerPlayer player, List<ItemStack> required) {
+	public static void removeAll(ServerPlayer player, List<ItemStack> required) {
 		Inventory inventory = player.getInventory();
 		for (ItemStack req : required) {
 			int remaining = req.getCount();
@@ -109,7 +113,7 @@ public final class TradeService {
 		}
 	}
 
-	private static void giveAll(ServerPlayer player, List<ItemStack> items) {
+	public static void giveAll(ServerPlayer player, List<ItemStack> items) {
 		for (ItemStack template : items) {
 			ItemStack toGive = template.copy();
 			if (!player.getInventory().add(toGive)) {
