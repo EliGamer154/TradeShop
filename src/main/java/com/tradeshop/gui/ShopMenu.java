@@ -47,6 +47,18 @@ public abstract class ShopMenu extends ChestMenu {
 	}
 
 	/**
+	 * Runs a container-switching action (opening another menu, or closing this
+	 * one) on the next server tick instead of immediately. Switching
+	 * {@code player.containerMenu} while the server is still in the middle of
+	 * processing this click's network packet crashes the server, since the
+	 * vanilla click-handling code that runs right after {@link #clicked} still
+	 * expects the menu it started with. Deferring by one tick avoids that.
+	 */
+	protected void openLater(Runnable action) {
+		player.level().getServer().execute(action);
+	}
+
+	/**
 	 * Called when the player clicks one of their own real inventory slots
 	 * (shown below the button grid). Default is a no-op; only the bundle
 	 * builder screen cares about this.

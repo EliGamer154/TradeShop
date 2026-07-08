@@ -36,19 +36,19 @@ public class BrowseListingsMenu extends ShopMenu {
 				ItemStack icon = listing.items.isEmpty() ? new ItemStack(Items.CHEST) : listing.items.get(0);
 				setButton(i, Icons.of(icon, "Listing by " + listing.ownerName,
 								Icons.summarize(listing.items), "Click to make an offer"),
-						() -> BundleBuilderMenu.openForOffer(player, listing.id));
+						() -> openLater(() -> BundleBuilderMenu.openForOffer(player, listing.id)));
 			} else {
 				clearButton(i);
 			}
 		}
-		setButton(45, Icons.of(new ItemStack(Items.ARROW), "Back"), () -> MainMenu.open(player));
+		setButton(45, Icons.of(new ItemStack(Items.ARROW), "Back"), () -> openLater(() -> MainMenu.open(player)));
 		if (page > 0) {
-			setButton(46, Icons.of(new ItemStack(Items.SPECTRAL_ARROW), "Previous Page"), () -> BrowseListingsMenu.open(player, page - 1));
+			setButton(46, Icons.of(new ItemStack(Items.SPECTRAL_ARROW), "Previous Page"), () -> openLater(() -> BrowseListingsMenu.open(player, page - 1)));
 		} else {
 			clearButton(46);
 		}
 		if (start + PAGE_SIZE < listings.size()) {
-			setButton(52, Icons.of(new ItemStack(Items.SPECTRAL_ARROW), "Next Page"), () -> BrowseListingsMenu.open(player, page + 1));
+			setButton(52, Icons.of(new ItemStack(Items.SPECTRAL_ARROW), "Next Page"), () -> openLater(() -> BrowseListingsMenu.open(player, page + 1)));
 		} else {
 			clearButton(52);
 		}

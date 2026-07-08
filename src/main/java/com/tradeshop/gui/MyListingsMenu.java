@@ -37,19 +37,19 @@ public class MyListingsMenu extends ShopMenu {
 				int offerCount = state.pendingOffersForListing(listing.id).size();
 				setButton(i, Icons.of(icon, "Your listing",
 								Icons.summarize(listing.items), offerCount + " pending offer(s) - click to view"),
-						() -> ListingOffersMenu.open(player, listing.id, 0));
+						() -> openLater(() -> ListingOffersMenu.open(player, listing.id, 0)));
 			} else {
 				clearButton(i);
 			}
 		}
-		setButton(45, Icons.of(new ItemStack(Items.ARROW), "Back"), () -> MainMenu.open(player));
+		setButton(45, Icons.of(new ItemStack(Items.ARROW), "Back"), () -> openLater(() -> MainMenu.open(player)));
 		if (page > 0) {
-			setButton(46, Icons.of(new ItemStack(Items.SPECTRAL_ARROW), "Previous Page"), () -> MyListingsMenu.open(player, page - 1));
+			setButton(46, Icons.of(new ItemStack(Items.SPECTRAL_ARROW), "Previous Page"), () -> openLater(() -> MyListingsMenu.open(player, page - 1)));
 		} else {
 			clearButton(46);
 		}
 		if (start + PAGE_SIZE < listings.size()) {
-			setButton(52, Icons.of(new ItemStack(Items.SPECTRAL_ARROW), "Next Page"), () -> MyListingsMenu.open(player, page + 1));
+			setButton(52, Icons.of(new ItemStack(Items.SPECTRAL_ARROW), "Next Page"), () -> openLater(() -> MyListingsMenu.open(player, page + 1)));
 		} else {
 			clearButton(52);
 		}

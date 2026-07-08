@@ -45,14 +45,14 @@ public class MyOffersMenu extends ShopMenu {
 				clearButton(i);
 			}
 		}
-		setButton(45, Icons.of(new ItemStack(Items.ARROW), "Back"), () -> MainMenu.open(player));
+		setButton(45, Icons.of(new ItemStack(Items.ARROW), "Back"), () -> openLater(() -> MainMenu.open(player)));
 		if (page > 0) {
-			setButton(46, Icons.of(new ItemStack(Items.SPECTRAL_ARROW), "Previous Page"), () -> MyOffersMenu.open(player, page - 1));
+			setButton(46, Icons.of(new ItemStack(Items.SPECTRAL_ARROW), "Previous Page"), () -> openLater(() -> MyOffersMenu.open(player, page - 1)));
 		} else {
 			clearButton(46);
 		}
 		if (start + PAGE_SIZE < offers.size()) {
-			setButton(52, Icons.of(new ItemStack(Items.SPECTRAL_ARROW), "Next Page"), () -> MyOffersMenu.open(player, page + 1));
+			setButton(52, Icons.of(new ItemStack(Items.SPECTRAL_ARROW), "Next Page"), () -> openLater(() -> MyOffersMenu.open(player, page + 1)));
 		} else {
 			clearButton(52);
 		}
@@ -70,6 +70,6 @@ public class MyOffersMenu extends ShopMenu {
 					player.sendSystemMessage(Component.literal("The seller must be online to complete this trade. Try again later."));
 			case NOT_FOUND -> player.sendSystemMessage(Component.literal("This offer is no longer valid."));
 		}
-		MyOffersMenu.open(player, 0);
+		openLater(() -> MyOffersMenu.open(player, 0));
 	}
 }

@@ -60,7 +60,7 @@ public class BundleBuilderMenu extends ShopMenu {
 					});
 			slot++;
 		}
-		setButton(45, Icons.of(new ItemStack(Items.BARRIER), "Cancel"), () -> player.closeContainer());
+		setButton(45, Icons.of(new ItemStack(Items.BARRIER), "Cancel"), () -> openLater(player::closeContainer));
 		setButton(49, Icons.of(new ItemStack(Items.DYE.pick(DyeColor.LIME)), "Confirm", bundle.size() + " item type(s) selected"), this::confirm);
 		setButton(53, Icons.of(new ItemStack(Items.DYE.pick(DyeColor.RED)), "Clear All"), () -> {
 			bundle.clear();
@@ -86,7 +86,7 @@ public class BundleBuilderMenu extends ShopMenu {
 
 	private void confirm() {
 		if (bundle.isEmpty()) {
-			player.closeContainer();
+			openLater(player::closeContainer);
 			return;
 		}
 		List<ItemStack> items = new ArrayList<>(bundle.values());
@@ -100,6 +100,6 @@ public class BundleBuilderMenu extends ShopMenu {
 				player.sendSystemMessage(Component.literal("Offer submitted!"));
 			}, () -> player.sendSystemMessage(Component.literal("That listing no longer exists.")));
 		}
-		player.closeContainer();
+		openLater(player::closeContainer);
 	}
 }

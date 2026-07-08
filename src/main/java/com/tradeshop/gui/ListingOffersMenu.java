@@ -44,14 +44,14 @@ public class ListingOffersMenu extends ShopMenu {
 				clearButton(i);
 			}
 		}
-		setButton(45, Icons.of(new ItemStack(Items.ARROW), "Back"), () -> MyListingsMenu.open(player, 0));
+		setButton(45, Icons.of(new ItemStack(Items.ARROW), "Back"), () -> openLater(() -> MyListingsMenu.open(player, 0)));
 		if (page > 0) {
-			setButton(46, Icons.of(new ItemStack(Items.SPECTRAL_ARROW), "Previous Page"), () -> ListingOffersMenu.open(player, listingId, page - 1));
+			setButton(46, Icons.of(new ItemStack(Items.SPECTRAL_ARROW), "Previous Page"), () -> openLater(() -> ListingOffersMenu.open(player, listingId, page - 1)));
 		} else {
 			clearButton(46);
 		}
 		if (start + PAGE_SIZE < offers.size()) {
-			setButton(52, Icons.of(new ItemStack(Items.SPECTRAL_ARROW), "Next Page"), () -> ListingOffersMenu.open(player, listingId, page + 1));
+			setButton(52, Icons.of(new ItemStack(Items.SPECTRAL_ARROW), "Next Page"), () -> openLater(() -> ListingOffersMenu.open(player, listingId, page + 1)));
 		} else {
 			clearButton(52);
 		}
@@ -68,6 +68,6 @@ public class ListingOffersMenu extends ShopMenu {
 				offerer.sendSystemMessage(Component.literal("Your offer was accepted! Use /shop -> My Offers to confirm the trade."));
 			}
 		});
-		MyListingsMenu.open(player, 0);
+		openLater(() -> MyListingsMenu.open(player, 0));
 	}
 }
