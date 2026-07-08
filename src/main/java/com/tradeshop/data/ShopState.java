@@ -126,4 +126,32 @@ public class ShopState extends SavedData {
 			setDirty();
 		});
 	}
+
+	/** Cancels a listing the given player owns, and any pending/accepted offers against it. */
+	public boolean cancelListing(UUID listingId, UUID requester) {
+		return findListing(listingId)
+				.filter(listing -> listing.ownerId.equals(requester) && listing.status == ListingStatus.OPEN)
+				.map(listing -> {
+					listing.status = ListingStatus.CANCELLED;
+					for (Offer offer : offersForListing(listingId)) {
+						if (offer.status == OfferStatus.PENDING || offer.status == OfferStatus.SELLER_ACCEPTED) {
+							offer.status = OfferStatus.CANCELLED;
+						}
+					}
+					setDirty();
+					return true;
+				}).orElse(false);
+	}
+
+	/** Withdraws an offer the given player made, as long as it hasn't completed or already ended. */
+	public boolean cancelOffer(UUID offerId, UUID requester) {
+		return findOffer(offerId)
+				.filter(offer -> offer.offererId.equals(requester)
+						&& (offer.status == OfferStatus.PENDING || offer.status == OfferStatus.SELLER_ACCEPTED))
+				.map(offer -> {
+					offer.status = OfferStatus.CANCELLED;
+					setDirty();
+					return true;
+				}).orElse(false);
+	}
 }

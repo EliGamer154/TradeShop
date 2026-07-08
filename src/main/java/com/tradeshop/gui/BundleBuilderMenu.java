@@ -46,10 +46,12 @@ public class BundleBuilderMenu extends ShopMenu {
 	}
 
 	private void render() {
-		for (int i = 0; i < 9; i++) {
-			clearButton(i);
-		}
-		int slot = 0;
+		fillBackground();
+
+		setDisplay(4, Icons.of(new ItemStack(Items.WRITABLE_BOOK), mode == Mode.LISTING ? "New Listing" : "New Offer",
+				"Click items in your inventory below", "to add them (up to " + MAX_TYPES + " types)"));
+
+		int slot = 9;
 		for (ItemStack stack : bundle.values()) {
 			ItemStack captured = stack;
 			setButton(slot, Icons.of(captured, captured.getHoverName().getString(), "Amount: " + captured.getCount(), "Click to remove"),

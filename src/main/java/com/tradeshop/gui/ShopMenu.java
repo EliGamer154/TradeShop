@@ -7,6 +7,7 @@ import net.minecraft.world.inventory.ChestMenu;
 import net.minecraft.world.inventory.ContainerInput;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 
 /**
  * Base for every TradeShop screen. Every slot (including the player's own
@@ -17,6 +18,13 @@ import net.minecraft.world.item.ItemStack;
  */
 public abstract class ShopMenu extends ChestMenu {
 	protected static final int SIZE = 54;
+
+	/**
+	 * Paginated menus lay their entries out in the 7x4 block interior to
+	 * {@link #fillBackground()}'s border (row 0, row 5, and the left/right
+	 * columns of rows 1-4 are reserved for decoration and navigation).
+	 */
+	protected static final int CONTENT_PAGE_SIZE = 28;
 
 	protected final ServerPlayer player;
 	private final SimpleContainer buttons;
@@ -40,6 +48,26 @@ public abstract class ShopMenu extends ChestMenu {
 	protected void clearButton(int slot) {
 		buttons.setItem(slot, ItemStack.EMPTY);
 		actions[slot] = null;
+	}
+
+	/** Sets a slot's icon without any click action - for labels and decoration. */
+	protected void setDisplay(int slot, ItemStack icon) {
+		buttons.setItem(slot, icon);
+		actions[slot] = null;
+	}
+
+	/** Resets every slot to a plain filler pane. Call at the start of render() before drawing content. */
+	protected void fillBackground() {
+		for (int i = 0; i < SIZE; i++) {
+			setDisplay(i, Icons.of(new ItemStack(Items.GRAY_STAINED_GLASS_PANE), " "));
+		}
+	}
+
+	/** Maps a 0-based content index to a slot inside the 7x4 interior grid (rows 1-4, columns 1-7). */
+	protected static int contentSlot(int index) {
+		int row = index / 7;
+		int col = index % 7;
+		return (row + 1) * 9 + (col + 1);
 	}
 
 	protected void refresh() {

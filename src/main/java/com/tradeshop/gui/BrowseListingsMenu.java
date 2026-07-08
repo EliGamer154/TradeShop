@@ -11,7 +11,6 @@ import net.minecraft.world.item.Items;
 import java.util.List;
 
 public class BrowseListingsMenu extends ShopMenu {
-	private static final int PAGE_SIZE = 45;
 	private final int page;
 
 	private BrowseListingsMenu(int containerId, ServerPlayer player, int page) {
@@ -26,31 +25,27 @@ public class BrowseListingsMenu extends ShopMenu {
 	}
 
 	private void render() {
+		fillBackground();
 		ShopState state = ShopState.get(player.level().getServer());
 		List<Listing> listings = state.openListingsExcluding(player.getUUID());
-		int start = page * PAGE_SIZE;
-		for (int i = 0; i < PAGE_SIZE; i++) {
+		int start = page * CONTENT_PAGE_SIZE;
+		for (int i = 0; i < CONTENT_PAGE_SIZE; i++) {
 			int index = start + i;
 			if (index < listings.size()) {
 				Listing listing = listings.get(index);
 				ItemStack icon = listing.items.isEmpty() ? new ItemStack(Items.CHEST) : listing.items.get(0);
-				setButton(i, Icons.of(icon, "Listing by " + listing.ownerName,
+				setButton(contentSlot(i), Icons.of(icon, "Listing by " + listing.ownerName,
 								Icons.summarize(listing.items), "Click to make an offer"),
 						() -> openLater(() -> BundleBuilderMenu.openForOffer(player, listing.id)));
-			} else {
-				clearButton(i);
 			}
 		}
 		setButton(45, Icons.of(new ItemStack(Items.ARROW), "Back"), () -> openLater(() -> MainMenu.open(player)));
+		setDisplay(49, Icons.of(new ItemStack(Items.PAPER), "Page " + (page + 1)));
 		if (page > 0) {
 			setButton(46, Icons.of(new ItemStack(Items.SPECTRAL_ARROW), "Previous Page"), () -> openLater(() -> BrowseListingsMenu.open(player, page - 1)));
-		} else {
-			clearButton(46);
 		}
-		if (start + PAGE_SIZE < listings.size()) {
+		if (start + CONTENT_PAGE_SIZE < listings.size()) {
 			setButton(52, Icons.of(new ItemStack(Items.SPECTRAL_ARROW), "Next Page"), () -> openLater(() -> BrowseListingsMenu.open(player, page + 1)));
-		} else {
-			clearButton(52);
 		}
 		refresh();
 	}
