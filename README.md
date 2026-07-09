@@ -6,8 +6,8 @@ A Fabric server-side mod for Minecraft **26.1.2 - 26.2** that adds a `/shop` pla
 
 Run `/shop` to open the trade menu:
 
-- **Add Listing** — pick items from your inventory (up to 9 distinct item types) that you're willing to trade away. Confirming **removes those items from your inventory immediately** and holds them in escrow inside the listing. You get them back in full if you cancel the listing; they're only handed to the buyer once a trade actually completes.
-- **Browse Listings** — see other players' open listings and make an offer (built from your own inventory, but offer items are *not* taken from you until the trade completes).
+- **Add Listing** — pick a single item (any quantity) from your inventory that you're willing to trade away. Confirming **removes it from your inventory immediately** and holds it in escrow inside the listing. You get it back in full if you cancel the listing; it's only handed to the buyer once a trade actually completes.
+- **Browse Listings** — see other players' open listings and make an offer (up to 9 distinct item types from your own inventory, but offer items are *not* taken from you until the trade completes).
 - **My Listings** — see offers made on your listings and **accept** one, or **cancel the listing** entirely (which returns the escrowed items to you and cancels any pending/accepted offers against it). Accepting a specific offer automatically cancels the other pending offers on that listing.
 - **My Offers** — click an offer to open its detail screen. Once the seller accepts, **Confirm Trade** completes it; at any point before that you can **Withdraw Offer**.
 
@@ -30,7 +30,7 @@ The output jar is written to `build/libs/`.
 
 ## Known limitations (v1)
 
-- A listing/offer can contain at most 9 distinct item types.
+- A listing is a single item type (any quantity); an offer can contain up to 9 distinct item types.
 - Both players must be online at the moment the trade is confirmed — there's no offline queue.
 - Item matching for "still has it" checks compares item type + full component/NBT data (so enchanted items must match exactly), but counts are summed across stacks.
 - No in-game currency — this is purely item-for-item barter.

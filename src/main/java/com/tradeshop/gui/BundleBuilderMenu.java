@@ -16,7 +16,8 @@ import java.util.UUID;
 
 /** Shared "pick items from your inventory" screen used by both Add Listing and Make Offer. */
 public class BundleBuilderMenu extends ShopMenu {
-	private static final int MAX_TYPES = 9;
+	private static final int MAX_LISTING_TYPES = 1;
+	private static final int MAX_OFFER_TYPES = 9;
 
 	private final Mode mode;
 	private final UUID listingId;
@@ -49,8 +50,9 @@ public class BundleBuilderMenu extends ShopMenu {
 	private void render() {
 		fillBackground();
 
-		setDisplay(4, Icons.of(new ItemStack(Items.WRITABLE_BOOK), mode == Mode.LISTING ? "New Listing" : "New Offer",
-				"Click items in your inventory below", "to add them (up to " + MAX_TYPES + " types)"));
+		setDisplay(4, mode == Mode.LISTING
+				? Icons.of(new ItemStack(Items.WRITABLE_BOOK), "New Listing", "Click one item in your inventory below", "to list it")
+				: Icons.of(new ItemStack(Items.WRITABLE_BOOK), "New Offer", "Click items in your inventory below", "to add them (up to " + MAX_OFFER_TYPES + " types)"));
 
 		int slot = 9;
 		for (ItemStack stack : bundle.values()) {
@@ -74,7 +76,8 @@ public class BundleBuilderMenu extends ShopMenu {
 	@Override
 	protected void onPlayerInventorySlotClicked(int playerSlot, ItemStack stack) {
 		ItemKey key = ItemKey.of(stack);
-		if (bundle.size() >= MAX_TYPES && !bundle.containsKey(key)) {
+		int maxTypes = mode == Mode.LISTING ? MAX_LISTING_TYPES : MAX_OFFER_TYPES;
+		if (bundle.size() >= maxTypes && !bundle.containsKey(key)) {
 			return;
 		}
 		ItemStack existing = bundle.get(key);
