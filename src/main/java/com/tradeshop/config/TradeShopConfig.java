@@ -17,7 +17,7 @@ public class TradeShopConfig {
 	private static TradeShopConfig instance = load();
 
 	/** How many listings a single player may have open at once. */
-	public int maxActiveListingsPerPlayer = 1;
+	public int maxActiveListingsPerPlayer = 15;
 
 	/** How many distinct item types a single offer may contain. */
 	public int maxOfferItemTypes = 9;
