@@ -1,0 +1,54 @@
+package com.tradeshop.config;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.tradeshop.TradeShop;
+import net.fabricmc.loader.api.FabricLoader;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+
+/** Admin-editable settings, stored as JSON under config/tradeshop.json. Reload in-game with /shop reload. */
+public class TradeShopConfig {
+	private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
+	private static final Path PATH = FabricLoader.getInstance().getConfigDir().resolve("tradeshop.json");
+
+	private static TradeShopConfig instance = load();
+
+	/** How many listings a single player may have open at once. */
+	public int maxActiveListingsPerPlayer = 1;
+
+	/** How many distinct item types a single offer may contain. */
+	public int maxOfferItemTypes = 9;
+
+	public static TradeShopConfig get() {
+		return instance;
+	}
+
+	public static TradeShopConfig load() {
+		TradeShopConfig config = new TradeShopConfig();
+		if (Files.exists(PATH)) {
+			try {
+				TradeShopConfig loaded = GSON.fromJson(Files.readString(PATH), TradeShopConfig.class);
+				if (loaded != null) {
+					config = loaded;
+				}
+			} catch (IOException e) {
+				TradeShop.LOGGER.warn("Failed to read tradeshop.json, using defaults", e);
+			}
+		}
+		config.save();
+		instance = config;
+		return config;
+	}
+
+	public void save() {
+		try {
+			Files.createDirectories(PATH.getParent());
+			Files.writeString(PATH, GSON.toJson(this));
+		} catch (IOException e) {
+			TradeShop.LOGGER.warn("Failed to write tradeshop.json", e);
+		}
+	}
+}

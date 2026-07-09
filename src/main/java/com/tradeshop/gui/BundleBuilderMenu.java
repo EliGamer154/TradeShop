@@ -1,5 +1,6 @@
 package com.tradeshop.gui;
 
+import com.tradeshop.config.TradeShopConfig;
 import com.tradeshop.data.ShopState;
 import com.tradeshop.trade.TradeService;
 import net.minecraft.network.chat.Component;
@@ -16,8 +17,6 @@ import java.util.UUID;
 
 /** Shared "pick items from your inventory" screen used by both Add Listing and Make Offer. */
 public class BundleBuilderMenu extends ShopMenu {
-	private static final int MAX_OFFER_TYPES = 9;
-
 	private final Mode mode;
 	private final UUID listingId;
 	private final Map<ItemKey, ItemStack> bundle = new LinkedHashMap<>();
@@ -50,8 +49,9 @@ public class BundleBuilderMenu extends ShopMenu {
 		fillBackground();
 
 		setDisplay(4, mode == Mode.LISTING
-				? Icons.of(new ItemStack(Items.WRITABLE_BOOK), "New Listing", "Click one item in your inventory below", "to list exactly 1 of it")
-				: Icons.of(new ItemStack(Items.WRITABLE_BOOK), "New Offer", "Click items in your inventory below", "to add them (up to " + MAX_OFFER_TYPES + " types)", "Click the same item again to offer more of it"));
+				? Icons.of(new ItemStack(Items.WRITABLE_BOOK), "New Listing", "Click one item in your inventory below", "Click it again to stack more, if it stacks")
+				: Icons.of(new ItemStack(Items.WRITABLE_BOOK), "New Offer", "Click items in your inventory below",
+				"to add them (up to " + TradeShopConfig.get().maxOfferItemTypes + " types)", "Click the same item again to offer more of it"));
 
 		int slot = 9;
 		for (ItemStack stack : bundle.values()) {
@@ -76,15 +76,23 @@ public class BundleBuilderMenu extends ShopMenu {
 	protected void onPlayerInventorySlotClicked(int playerSlot, ItemStack stack) {
 		ItemKey key = ItemKey.of(stack);
 		if (mode == Mode.LISTING) {
-			// A listing is exactly 1 unit of exactly 1 item - no stacking, no second type.
-			if (!bundle.isEmpty()) {
+			// A listing is exactly 1 item type, but you can stack up to that item's real max stack size.
+			if (!bundle.isEmpty() && !bundle.containsKey(key)) {
+				return;
+			}
+			ItemStack existing = bundle.get(key);
+			if (existing != null) {
+				if (existing.getCount() < existing.getMaxStackSize()) {
+					existing.grow(1);
+					render();
+				}
 				return;
 			}
 			bundle.put(key, stack.copyWithCount(1));
 			render();
 			return;
 		}
-		if (bundle.size() >= MAX_OFFER_TYPES && !bundle.containsKey(key)) {
+		if (bundle.size() >= TradeShopConfig.get().maxOfferItemTypes && !bundle.containsKey(key)) {
 			return;
 		}
 		ItemStack existing = bundle.get(key);
@@ -104,6 +112,12 @@ public class BundleBuilderMenu extends ShopMenu {
 		List<ItemStack> items = new ArrayList<>(bundle.values());
 		ShopState state = ShopState.get(player.level().getServer());
 		if (mode == Mode.LISTING) {
+			int maxListings = TradeShopConfig.get().maxActiveListingsPerPlayer;
+			if (state.listingsByOwner(player.getUUID()).size() >= maxListings) {
+				player.sendSystemMessage(Component.literal("You already have the maximum number of active listings (" + maxListings + ")."));
+				openLater(player::closeContainer);
+				return;
+			}
 			if (!TradeService.hasAll(player, items)) {
 				player.sendSystemMessage(Component.literal("You no longer have all of those items - listing not created."));
 				bundle.clear();
