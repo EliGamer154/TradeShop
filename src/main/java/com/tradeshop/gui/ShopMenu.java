@@ -1,5 +1,6 @@
 package com.tradeshop.gui;
 
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Player;
@@ -28,7 +29,8 @@ public abstract class ShopMenu extends ChestMenu {
 
 	protected final ServerPlayer player;
 	private final SimpleContainer buttons;
-	private final Runnable[] actions = new Runnable[SIZE];
+	private final Runnable[] leftActions = new Runnable[SIZE];
+	private final Runnable[] rightActions = new Runnable[SIZE];
 
 	protected ShopMenu(int containerId, ServerPlayer player) {
 		this(containerId, player, new SimpleContainer(SIZE));
@@ -40,20 +42,57 @@ public abstract class ShopMenu extends ChestMenu {
 		this.buttons = container;
 	}
 
+	/** Registers a button that runs the same action regardless of which mouse button was clicked. */
 	protected void setButton(int slot, ItemStack icon, Runnable action) {
+		setButton(slot, icon, action, action);
+	}
+
+	/** Registers a button with separate left-click and right-click behavior. Either may be null for no-op. */
+	protected void setButton(int slot, ItemStack icon, Runnable leftClickAction, Runnable rightClickAction) {
 		buttons.setItem(slot, icon);
-		actions[slot] = action;
+		leftActions[slot] = leftClickAction;
+		rightActions[slot] = rightClickAction;
 	}
 
 	protected void clearButton(int slot) {
 		buttons.setItem(slot, ItemStack.EMPTY);
-		actions[slot] = null;
+		leftActions[slot] = null;
+		rightActions[slot] = null;
 	}
 
 	/** Sets a slot's icon without any click action - for labels and decoration. */
 	protected void setDisplay(int slot, ItemStack icon) {
 		buttons.setItem(slot, icon);
-		actions[slot] = null;
+		leftActions[slot] = null;
+		rightActions[slot] = null;
+	}
+
+	/**
+	 * Shows an item as a display with a right-click "peek inside" action when it's a
+	 * shulker box (or anything else carrying container contents); otherwise behaves
+	 * like {@link #setDisplay}. {@code onBack} reopens the current screen.
+	 */
+	protected void setItemDisplay(int slot, ItemStack item, Runnable onBack) {
+		buttons.setItem(slot, item);
+		leftActions[slot] = null;
+		rightActions[slot] = hasContainerContents(item) ? () -> openLater(() -> ShulkerContentsMenu.open(player, item, onBack)) : null;
+	}
+
+	/**
+	 * Registers a button whose left click runs {@code leftClickAction}, and whose
+	 * right click opens a read-only peek at {@code item}'s contents when it's a
+	 * shulker box (or anything else carrying container contents). {@code onBack}
+	 * reopens the current screen after peeking.
+	 */
+	protected void setItemButton(int slot, ItemStack item, Runnable leftClickAction, Runnable onBack) {
+		Runnable rightClickAction = hasContainerContents(item)
+				? () -> openLater(() -> ShulkerContentsMenu.open(player, item, onBack))
+				: leftClickAction;
+		setButton(slot, item, leftClickAction, rightClickAction);
+	}
+
+	protected static boolean hasContainerContents(ItemStack stack) {
+		return stack.has(DataComponents.CONTAINER);
 	}
 
 	/** Resets every slot to a plain filler pane. Call at the start of render() before drawing content. */
@@ -100,7 +139,8 @@ public abstract class ShopMenu extends ChestMenu {
 			return;
 		}
 		if (slotId < SIZE) {
-			Runnable action = actions[slotId];
+			boolean rightClick = containerInput == ContainerInput.PICKUP && clickData == 1;
+			Runnable action = rightClick ? rightActions[slotId] : leftActions[slotId];
 			if (action != null) {
 				action.run();
 			}

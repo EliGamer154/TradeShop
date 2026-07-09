@@ -34,9 +34,11 @@ public class BrowseListingsMenu extends ShopMenu {
 			if (index < listings.size()) {
 				Listing listing = listings.get(index);
 				ItemStack icon = listing.items.isEmpty() ? new ItemStack(Items.CHEST) : listing.items.get(0);
-				setButton(contentSlot(i), Icons.of(icon, "Listing by " + listing.ownerName,
-								Icons.summarize(listing.items), "Click to make an offer"),
-						() -> openLater(() -> BundleBuilderMenu.openForOffer(player, listing.id)));
+				ItemStack displayIcon = Icons.of(icon, "Listing by " + listing.ownerName,
+						Icons.summarize(listing.items), "Click to make an offer", Icons.peekHint(icon));
+				setItemButton(contentSlot(i), displayIcon,
+						() -> openLater(() -> BundleBuilderMenu.openForOffer(player, listing.id)),
+						() -> BrowseListingsMenu.open(player, page));
 			}
 		}
 		setButton(45, Icons.of(new ItemStack(Items.ARROW), "Back"), () -> openLater(() -> MainMenu.open(player)));

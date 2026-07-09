@@ -43,7 +43,8 @@ public class IncomingOfferMenu extends ShopMenu {
 
 		int slot = 0;
 		for (ItemStack item : offer.items) {
-			setDisplay(contentSlot(slot), Icons.of(item, item.getHoverName().getString(), "Amount: " + item.getCount()));
+			ItemStack displayIcon = Icons.of(item, item.getHoverName().getString(), "Amount: " + item.getCount(), Icons.peekHint(item));
+			setItemDisplay(contentSlot(slot), displayIcon, () -> IncomingOfferMenu.open(player, listingId, offerId));
 			slot++;
 		}
 

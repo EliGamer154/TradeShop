@@ -42,12 +42,14 @@ public class OfferDetailMenu extends ShopMenu {
 		Optional<Listing> listingOpt = state.findListing(offer.listingId);
 
 		ItemStack offerIcon = offer.items.isEmpty() ? new ItemStack(Items.PAPER) : offer.items.get(0);
-		setDisplay(contentSlot(2), Icons.of(offerIcon, "Your Offer", Icons.summarize(offer.items)));
+		ItemStack offerDisplay = Icons.of(offerIcon, "Your Offer", Icons.summarize(offer.items), Icons.peekHint(offerIcon));
+		setItemDisplay(contentSlot(2), offerDisplay, () -> OfferDetailMenu.open(player, offerId));
 
 		ItemStack listingIcon = listingOpt.map(l -> l.items.isEmpty() ? new ItemStack(Items.CHEST) : l.items.get(0))
 				.orElse(new ItemStack(Items.BARRIER));
 		String listingSummary = listingOpt.map(l -> Icons.summarize(l.items)).orElse("This listing no longer exists");
-		setDisplay(contentSlot(4), Icons.of(listingIcon, "You'll Receive", listingSummary));
+		ItemStack listingDisplay = Icons.of(listingIcon, "You'll Receive", listingSummary, Icons.peekHint(listingIcon));
+		setItemDisplay(contentSlot(4), listingDisplay, () -> OfferDetailMenu.open(player, offerId));
 
 		boolean ready = offer.status == OfferStatus.SELLER_ACCEPTED;
 		if (ready) {

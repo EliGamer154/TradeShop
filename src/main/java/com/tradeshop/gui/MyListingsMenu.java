@@ -35,9 +35,11 @@ public class MyListingsMenu extends ShopMenu {
 				Listing listing = listings.get(index);
 				ItemStack icon = listing.items.isEmpty() ? new ItemStack(Items.CHEST) : listing.items.get(0);
 				int offerCount = state.pendingOffersForListing(listing.id).size();
-				setButton(contentSlot(i), Icons.of(icon, "Your listing",
-								Icons.summarize(listing.items), offerCount + " pending offer(s) - click to view"),
-						() -> openLater(() -> ListingOffersMenu.open(player, listing.id, 0)));
+				ItemStack displayIcon = Icons.of(icon, "Your listing",
+						Icons.summarize(listing.items), offerCount + " pending offer(s) - click to view", Icons.peekHint(icon));
+				setItemButton(contentSlot(i), displayIcon,
+						() -> openLater(() -> ListingOffersMenu.open(player, listing.id, 0)),
+						() -> MyListingsMenu.open(player, page));
 			}
 		}
 		setButton(45, Icons.of(new ItemStack(Items.ARROW), "Back"), () -> openLater(() -> MainMenu.open(player)));

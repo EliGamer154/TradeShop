@@ -41,6 +41,11 @@ final class Icons {
 		return stack;
 	}
 
+	/** Lore hint to append only when the item actually has something to peek inside (e.g. a shulker box). */
+	static String peekHint(ItemStack stack) {
+		return ShopMenu.hasContainerContents(stack) ? "Right-click to peek inside" : "";
+	}
+
 	static String summarize(List<ItemStack> items) {
 		StringBuilder sb = new StringBuilder();
 		for (ItemStack stack : items) {

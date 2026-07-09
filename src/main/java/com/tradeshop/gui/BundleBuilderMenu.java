@@ -16,7 +16,6 @@ import java.util.UUID;
 
 /** Shared "pick items from your inventory" screen used by both Add Listing and Make Offer. */
 public class BundleBuilderMenu extends ShopMenu {
-	private static final int MAX_LISTING_TYPES = 1;
 	private static final int MAX_OFFER_TYPES = 9;
 
 	private final Mode mode;
@@ -51,8 +50,8 @@ public class BundleBuilderMenu extends ShopMenu {
 		fillBackground();
 
 		setDisplay(4, mode == Mode.LISTING
-				? Icons.of(new ItemStack(Items.WRITABLE_BOOK), "New Listing", "Click one item in your inventory below", "to list it")
-				: Icons.of(new ItemStack(Items.WRITABLE_BOOK), "New Offer", "Click items in your inventory below", "to add them (up to " + MAX_OFFER_TYPES + " types)"));
+				? Icons.of(new ItemStack(Items.WRITABLE_BOOK), "New Listing", "Click one item in your inventory below", "to list exactly 1 of it")
+				: Icons.of(new ItemStack(Items.WRITABLE_BOOK), "New Offer", "Click items in your inventory below", "to add them (up to " + MAX_OFFER_TYPES + " types)", "Click the same item again to offer more of it"));
 
 		int slot = 9;
 		for (ItemStack stack : bundle.values()) {
@@ -76,8 +75,16 @@ public class BundleBuilderMenu extends ShopMenu {
 	@Override
 	protected void onPlayerInventorySlotClicked(int playerSlot, ItemStack stack) {
 		ItemKey key = ItemKey.of(stack);
-		int maxTypes = mode == Mode.LISTING ? MAX_LISTING_TYPES : MAX_OFFER_TYPES;
-		if (bundle.size() >= maxTypes && !bundle.containsKey(key)) {
+		if (mode == Mode.LISTING) {
+			// A listing is exactly 1 unit of exactly 1 item - no stacking, no second type.
+			if (!bundle.isEmpty()) {
+				return;
+			}
+			bundle.put(key, stack.copyWithCount(1));
+			render();
+			return;
+		}
+		if (bundle.size() >= MAX_OFFER_TYPES && !bundle.containsKey(key)) {
 			return;
 		}
 		ItemStack existing = bundle.get(key);
