@@ -38,10 +38,9 @@ public class ListingOffersMenu extends ShopMenu {
 			int index = start + i;
 			if (index < offers.size()) {
 				Offer offer = offers.get(index);
-				ItemStack icon = offer.items.isEmpty() ? new ItemStack(Items.PAPER) : offer.items.get(0);
-				setButton(contentSlot(i), Icons.of(icon, "Offer from " + offer.offererName,
-								Icons.summarize(offer.items), "Click to ACCEPT this offer"),
-						() -> accept(offer));
+				setButton(contentSlot(i), Icons.head(offer.offererId, offer.offererName,
+								Icons.summarize(offer.items), "Click to view and accept"),
+						() -> openLater(() -> IncomingOfferMenu.open(player, listingId, offer.id)));
 			}
 		}
 		setButton(45, Icons.of(new ItemStack(Items.ARROW), "Back"), () -> openLater(() -> MyListingsMenu.open(player, 0)));
@@ -54,19 +53,6 @@ public class ListingOffersMenu extends ShopMenu {
 			setButton(52, Icons.of(new ItemStack(Items.SPECTRAL_ARROW), "Next Page"), () -> openLater(() -> ListingOffersMenu.open(player, listingId, page + 1)));
 		}
 		refresh();
-	}
-
-	private void accept(Offer offer) {
-		ShopState state = ShopState.get(player.level().getServer());
-		state.sellerAccept(offer.id);
-		player.sendSystemMessage(Component.literal("Offer accepted! Waiting for the other player to confirm the trade."));
-		state.findOffer(offer.id).ifPresent(updated -> {
-			ServerPlayer offerer = player.level().getServer().getPlayerList().getPlayer(updated.offererId);
-			if (offerer != null) {
-				offerer.sendSystemMessage(Component.literal("Your offer was accepted! Use /shop -> My Offers to confirm the trade."));
-			}
-		});
-		openLater(() -> MyListingsMenu.open(player, 0));
 	}
 
 	private void cancelListing() {
