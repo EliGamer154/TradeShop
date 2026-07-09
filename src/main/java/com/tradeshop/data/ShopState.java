@@ -98,6 +98,10 @@ public class ShopState extends SavedData {
 				.collect(Collectors.toList());
 	}
 
+	public List<Listing> allOpenListings() {
+		return listings.stream().filter(l -> l.status == ListingStatus.OPEN).collect(Collectors.toList());
+	}
+
 	public List<Offer> pendingOffersForListing(UUID listingId) {
 		return offers.stream()
 				.filter(o -> o.listingId.equals(listingId) && o.status == OfferStatus.PENDING)
@@ -131,16 +135,27 @@ public class ShopState extends SavedData {
 	public boolean cancelListing(UUID listingId, UUID requester) {
 		return findListing(listingId)
 				.filter(listing -> listing.ownerId.equals(requester) && listing.status == ListingStatus.OPEN)
-				.map(listing -> {
-					listing.status = ListingStatus.CANCELLED;
-					for (Offer offer : offersForListing(listingId)) {
-						if (offer.status == OfferStatus.PENDING || offer.status == OfferStatus.SELLER_ACCEPTED) {
-							offer.status = OfferStatus.CANCELLED;
-						}
-					}
-					setDirty();
-					return true;
-				}).orElse(false);
+				.map(this::cancelListingInternal)
+				.orElse(false);
+	}
+
+	/** Cancels any open listing regardless of owner, for admin moderation. */
+	public boolean forceCancelListing(UUID listingId) {
+		return findListing(listingId)
+				.filter(listing -> listing.status == ListingStatus.OPEN)
+				.map(this::cancelListingInternal)
+				.orElse(false);
+	}
+
+	private boolean cancelListingInternal(Listing listing) {
+		listing.status = ListingStatus.CANCELLED;
+		for (Offer offer : offersForListing(listing.id)) {
+			if (offer.status == OfferStatus.PENDING || offer.status == OfferStatus.SELLER_ACCEPTED) {
+				offer.status = OfferStatus.CANCELLED;
+			}
+		}
+		setDirty();
+		return true;
 	}
 
 	/** Withdraws an offer the given player made, as long as it hasn't completed or already ended. */

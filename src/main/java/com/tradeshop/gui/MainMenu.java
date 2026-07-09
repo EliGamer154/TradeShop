@@ -3,6 +3,7 @@ package com.tradeshop.gui;
 import com.tradeshop.data.ShopState;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.players.NameAndId;
 import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -30,6 +31,12 @@ public class MainMenu extends ShopMenu {
 				() -> openLater(() -> MyListingsMenu.open(player, 0)));
 		setButton(25, Icons.of(new ItemStack(Items.PAPER), "My Offers", myOffers + " active offer(s)", "View, confirm, or withdraw your offers"),
 				() -> openLater(() -> MyOffersMenu.open(player, 0)));
+
+		boolean isOp = player.level().getServer().getPlayerList().isOp(new NameAndId(player.getGameProfile()));
+		if (isOp) {
+			setButton(40, Icons.of(new ItemStack(Items.NETHER_STAR), "Admin: Manage Listings", "Force-delete any player's listing"),
+					() -> openLater(() -> AdminListingsMenu.open(player, 0)));
+		}
 
 		refresh();
 	}

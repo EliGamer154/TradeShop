@@ -15,6 +15,8 @@ The trade only actually happens when both sides have confirmed. Since the listin
 
 Anywhere a listed or offered item is shown as an icon, **right-click it to peek inside** if it's a shulker box (or anything else carrying container contents).
 
+**Server operators** (OP) see an extra **Admin: Manage Listings** button in the main menu, listing every open listing from every player with a force-delete action. Deleting one returns the escrowed item to its owner if they're online; if not, the item is forfeited.
+
 ## Requirements
 
 - Minecraft **26.1.2 - 26.2** (Fabric)
