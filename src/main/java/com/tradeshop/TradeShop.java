@@ -1,5 +1,6 @@
 package com.tradeshop;
 
+import com.tradeshop.command.RtpCommand;
 import com.tradeshop.command.ShopCommand;
 import com.tradeshop.config.TradeShopConfig;
 import net.fabricmc.api.ModInitializer;
@@ -16,7 +17,10 @@ public class TradeShop implements ModInitializer {
 	@Override
 	public void onInitialize() {
 		TradeShopConfig.load();
-		CommandRegistrationCallback.EVENT.register((dispatcher, buildContext, selection) -> ShopCommand.register(dispatcher));
+		CommandRegistrationCallback.EVENT.register((dispatcher, buildContext, selection) -> {
+			ShopCommand.register(dispatcher);
+			RtpCommand.register(dispatcher);
+		});
 		LOGGER.info("TradeShop initialized");
 	}
 
